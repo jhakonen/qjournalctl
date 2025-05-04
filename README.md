@@ -58,6 +58,12 @@ to build and install libssh yourself (< 2 minutes!)
 3. Run `make -j$(nproc)` to compile qjournalctl
 4. Run `sudo make install`  
 
+Step 4 installs QJournalctl under `/usr`. If this is incorrect the path can be changed by defining
+`PREFIX` environment variable before running `autogen.sh`, for example:
+
+```bash
+PREFIX=/usr/local ./autogen.sh
+```
 
 
 ## QJournalctl for macOS
