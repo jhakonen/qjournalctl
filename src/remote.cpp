@@ -43,20 +43,20 @@ Remote::Remote(QObject *qObject, SSHConnectionSettings *sshSettings)
     int ok, progressIndex;
     bool finished;
 
-    auto connectingIndication = new QProgressDialog();
-    auto bar = new QProgressBar(connectingIndication);
+    QProgressDialog connectingIndication;
+    auto bar = new QProgressBar(&connectingIndication);
 
     bar->setTextVisible(false);
-    connectingIndication->setBar(bar);
-    connectingIndication->setWindowTitle("Connecting");
-    connectingIndication->setLabelText("Establishing the connection with " + QString::fromUtf8(sshSettings->getHostname()) + ". Please wait...");
-    connectingIndication->setCancelButton(nullptr);
-    connectingIndication->setRange(0, 0);
-    connectingIndication->setWindowModality(Qt::WindowModal);
-    connectingIndication->setMinimumDuration(0);
+    connectingIndication.setBar(bar);
+    connectingIndication.setWindowTitle("Connecting");
+    connectingIndication.setLabelText("Establishing the connection with " + QString::fromUtf8(sshSettings->getHostname()) + ". Please wait...");
+    connectingIndication.setCancelButton(nullptr);
+    connectingIndication.setRange(0, 0);
+    connectingIndication.setWindowModality(Qt::WindowModal);
+    connectingIndication.setMinimumDuration(0);
 
     // A Progress indicator is launched
-    connectingIndication->show();
+    connectingIndication.show();
 
     finished = false;
     std::thread *connectThread = new std::thread([&]() {
@@ -68,13 +68,13 @@ Remote::Remote(QObject *qObject, SSHConnectionSettings *sshSettings)
     progressIndex = 0;
     while(!finished)
     {
-        connectingIndication->setValue(progressIndex);
+        connectingIndication.setValue(progressIndex);
         progressIndex+=1;
         progressIndex=progressIndex%100;
         _custom_usleep(100000);
     }
 
-    connectingIndication->hide();
+    connectingIndication.reset();
     if(ok != SSH_OK){
         ssh_free(ssh);
         throw new Error("Establishing a connection to the remote host failed. Please try again!");
