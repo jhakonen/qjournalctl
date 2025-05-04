@@ -19,6 +19,9 @@ CONFIG += c++11
 # qmake qjournalctl.pro CONFIG+=release CONFIG+=x86_64 VCPKG_FOLDER=%VCPKG_INSTALL_FOLDER%
 !defined(VCPKG_FOLDER, var):VCPKG_FOLDER = $$_PRO_FILE_PWD_\vcpkg
 
+# Use /usr as installation prefix if not provided
+isEmpty(PREFIX):PREFIX = /usr
+
 SOURCES += src/main.cpp\
 	src/connectiondialog.cpp \
 	src/connection.cpp \
@@ -64,14 +67,14 @@ RESOURCES += \
 # This prevents qmake from failing when trying to install
 # the desktop environment files
 QMAKE_STRIP = echo
-target.path = /usr/bin
+target.path = $$PREFIX/bin
 
 # Desktop environment files
-desktop-file.path = /usr/share/applications
+desktop-file.path = $$PREFIX/share/applications
 desktop-file.files += ui/qjournalctl.desktop
-desktop-icon.path = /usr/share/pixmaps
+desktop-icon.path = $$PREFIX/share/pixmaps
 desktop-icon.files += ui/qjournalctl.png
-metainfo-file.path = /usr/share/metainfo
+metainfo-file.path = $$PREFIX/share/metainfo
 metainfo-file.files += qjournalctl.appdata.xml
 
 INSTALLS += target desktop-file desktop-icon metainfo-file
