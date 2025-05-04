@@ -13,6 +13,8 @@
 #include <thread>
 #include <QProcess>
 #include <QDebug>
+#include <QtConcurrent>
+#include <QFutureWatcher>
 #include <QProgressDialog>
 #include <QProgressBar>
 
@@ -40,41 +42,34 @@ Remote::Remote(QObject *qObject, SSHConnectionSettings *sshSettings)
     ssh_options_set(ssh, SSH_OPTIONS_HOST, sshSettings->getHostname());
     ssh_options_set(ssh, SSH_OPTIONS_USER, sshSettings->getUsername());
     ssh_options_set(ssh, SSH_OPTIONS_PORT, sshSettings->getPort());
-    int ok, progressIndex;
-    bool finished;
+    int ok;
 
-    auto connectingIndication = new QProgressDialog();
-    auto bar = new QProgressBar(connectingIndication);
-
+    // Show progress dialog after 4 seconds if not yet connected by then
+    QProgressDialog connectingIndication;
+    auto bar = new QProgressBar(&connectingIndication);
     bar->setTextVisible(false);
-    connectingIndication->setBar(bar);
-    connectingIndication->setWindowTitle("Connecting");
-    connectingIndication->setLabelText("Establishing the connection with " + QString::fromUtf8(sshSettings->getHostname()) + ". Please wait...");
-    connectingIndication->setCancelButton(nullptr);
-    connectingIndication->setRange(0, 0);
-    connectingIndication->setWindowModality(Qt::WindowModal);
-    connectingIndication->setMinimumDuration(0);
+    connectingIndication.setBar(bar);
+    connectingIndication.setWindowTitle("Connecting");
+    connectingIndication.setLabelText("Establishing the connection with " + QString::fromUtf8(sshSettings->getHostname()) + ". Please wait...");
+    connectingIndication.setCancelButton(nullptr);
+    connectingIndication.setRange(0, 0);
+    connectingIndication.setWindowModality(Qt::WindowModal);
+    connectingIndication.setValue(0);
 
-    // A Progress indicator is launched
-    connectingIndication->show();
-
-    finished = false;
-    std::thread *connectThread = new std::thread([&]() {
-        // Let's stablish the connection
+    QEventLoop loop;
+    QFutureWatcher<void> watcher;
+    connect(&watcher, SIGNAL(finished()), &loop, SLOT(quit()));
+    watcher.setFuture(QtConcurrent::run([&]() {
+        // Let's establish the connection
         ok = ssh_connect(ssh);
-        finished = true;
-    });
+    }));
 
-    progressIndex = 0;
-    while(!finished)
-    {
-        connectingIndication->setValue(progressIndex);
-        progressIndex+=1;
-        progressIndex=progressIndex%100;
-        _custom_usleep(100000);
-    }
+    // Block execution, waiting for thread to exit
+    loop.exec();
 
-    connectingIndication->hide();
+    // Close progress dialog
+    connectingIndication.reset();
+
     if(ok != SSH_OK){
         ssh_free(ssh);
         throw new Error("Establishing a connection to the remote host failed. Please try again!");
