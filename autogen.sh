@@ -19,5 +19,5 @@ if [ "$(uname -s)" = "Darwin" ]; then
   QMAKE_SPEC="macx-clang"
 fi
 
-QT_SELECT=qt5 $QMAKE_BIN qjournalctl.pro -r -spec $QMAKE_SPEC CONFIG+=release
+QT_SELECT=qt5 $QMAKE_BIN qjournalctl.pro -r -spec $QMAKE_SPEC CONFIG+=release "PREFIX=\"$PREFIX\""
 
