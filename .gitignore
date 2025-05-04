@@ -12,3 +12,4 @@ qrc_icon.cpp
 vcpkg/*
 release/*
 Makefile.*
+result
