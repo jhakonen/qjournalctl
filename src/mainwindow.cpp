@@ -115,7 +115,7 @@ void MainWindow::on_listBootsButton_clicked()
         message_box.show();
         return;
     }
-    QStringList lines = listBootsOutput.split("\n", QString::SkipEmptyParts);
+    QStringList lines = listBootsOutput.split("\n", Qt::SkipEmptyParts);
 
 
     bootModel = new QStandardItemModel(1, 5, this);
@@ -127,7 +127,7 @@ void MainWindow::on_listBootsButton_clicked()
 
     for(int i=0; i<lines.size(); i++){
         QString line = QString(lines.at(i).toLocal8Bit().constData());
-        QStringList columns = line.split(" ", QString::SkipEmptyParts);
+        QStringList columns = line.split(" ", Qt::SkipEmptyParts);
 
         if(columns.size() < 9){
             continue;

@@ -33,6 +33,7 @@ void _custom_usleep(int sleepUs)
 }
 
 Remote::Remote(QObject *qObject, SSHConnectionSettings *sshSettings)
+    : QObject(qObject)
 {
     ssh = ssh_new();
     assert(ssh != nullptr);
@@ -59,7 +60,7 @@ Remote::Remote(QObject *qObject, SSHConnectionSettings *sshSettings)
     connectingIndication.show();
 
     finished = false;
-    std::thread *connectThread = new std::thread([&]() {
+    std::thread connectThread([&]() {
         // Let's stablish the connection
         ok = ssh_connect(ssh);
         finished = true;
@@ -73,6 +74,7 @@ Remote::Remote(QObject *qObject, SSHConnectionSettings *sshSettings)
         progressIndex=progressIndex%100;
         _custom_usleep(100000);
     }
+    connectThread.join();
 
     connectingIndication.reset();
     if(ok != SSH_OK){
@@ -367,7 +369,7 @@ QString Remote::runAndWait(QString program, QStringList arguments)
     ssh_channel_request_exec(sshChannel, data);
 
     // Block until the process ended
-    ssh_channel_get_exit_status(sshChannel);
+    ssh_channel_get_exit_state(sshChannel, NULL, NULL, NULL);
     int bytes = ssh_channel_poll(sshChannel, 0);
 
     // Error?

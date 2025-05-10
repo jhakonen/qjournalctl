@@ -13,6 +13,7 @@
 
 // Constructor for a local connection
 Connection::Connection(QObject *qObject)
+    : QObject(qObject)
 {
     this->qObject = qObject;
     this->localConnection = new Local(qObject);
@@ -24,6 +25,7 @@ Connection::Connection(QObject *qObject)
 
 // Constructor for a remote SSH connection
 Connection::Connection(QObject *qObject, SSHConnectionSettings *sshSettings)
+    : QObject(qObject)
 {
     this->qObject = qObject;
 

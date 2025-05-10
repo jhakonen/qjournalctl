@@ -12,6 +12,7 @@
 #include <QDebug>
 
 Local::Local(QObject *qObject)
+    : QObject(qObject)
 {
     journalProcess = new QProcess(qObject);
     connect(journalProcess, SIGNAL(readyRead()), this, SLOT(processHasData()));

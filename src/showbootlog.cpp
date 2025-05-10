@@ -228,7 +228,7 @@ void ShowBootLog::appendToBootLog(QString readString)
     }
 
     this->allIdentifiers += identifierSet;
-    QCompleter *completer = new QCompleter(this->allIdentifiers.toList());
+    QCompleter *completer = new QCompleter(this->allIdentifiers.values());
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setCompletionMode(QCompleter::PopupCompletion);
     ui->identifiersLineEdit->setCompleter(completer);
