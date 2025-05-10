@@ -24,30 +24,28 @@ Local::~Local()
 }
 
 
-void Local::run(QString cmd)
+void Local::run(QString program, QStringList arguments)
 {
     // Make sure to terminate an already running process first
     if(isRunning()){
         journalProcess->close();
     }
 
-    QString localAddendum = " ";
     if(directory != "") {
-        localAddendum += "--directory " + directory;
+        arguments << "--directory" << directory;
     }
 
-    journalProcess->start(cmd + localAddendum);
+    journalProcess->start(program, arguments);
 }
 
-QString Local::runAndWait(QString cmd)
+QString Local::runAndWait(QString program, QStringList arguments)
 {
-    QString localAddendum = " ";
     if(directory != "") {
-        localAddendum += "--directory " + directory;
+        arguments << "--directory" << directory;
     }
 
     QProcess p;
-    p.start(cmd + localAddendum);
+    p.start(program, arguments);
     p.waitForFinished(-1);
 
     return QString(p.readAllStandardOutput());

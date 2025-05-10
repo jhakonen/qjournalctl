@@ -34,9 +34,9 @@ public:
     bool isRemote();
     bool isRunning();
     void close();
-    void run(QString);
+    void run(QString, QStringList);
     void setParam(CONNECTION_PARAM, QString);
-    QString runAndWait(QString);
+    QString runAndWait(QString, QStringList);
 
 signals:
     void connectionDataAvailable(QString);

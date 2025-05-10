@@ -335,24 +335,32 @@ void Remote::initSSHChannel()
 }
 
 
-void Remote::run(QString cmd)
+void Remote::run(QString program, QStringList arguments)
 {
     sshMutex.lock();
 
     initSSHChannel();
 
+    QString cmd = program;
+    for(QString argument : arguments){
+        if(argument.contains(' ')){
+            argument = '"' + argument + '"';
+        }
+        cmd += " " + argument;
+    }
+
     sshCmd = cmd + "\n";
     sshMutex.unlock();
 }
 
-QString Remote::runAndWait(QString cmd)
+QString Remote::runAndWait(QString program, QStringList arguments)
 {
     sshMutex.lock();
 
     // Issue normal 'run' to setup the channel, note the recursive locking!
     // This will prevent the other thread from actually executing the
     // command and reading our data.
-    run(cmd);
+    run(program, arguments);
 
     // So we have to run the command ourself
     char *data = sshCmd.toUtf8().data();

@@ -107,7 +107,8 @@ void MainWindow::refreshSavedConnectionsMenu()
 
 void MainWindow::on_listBootsButton_clicked()
 {
-    QString listBootsOutput = currentConnection->runAndWait("journalctl -q --list-boots");
+
+    QString listBootsOutput = currentConnection->runAndWait("journalctl", { "-q", "--list-boots" });
     if (listBootsOutput.length() == 0) {
         QMessageBox message_box;
         message_box.critical(nullptr, "Error", "No boots have been found");
@@ -211,7 +212,7 @@ void MainWindow::on_actionShowCompleteJournal_triggered()
 
 void MainWindow::on_actionSizeOfTheJournalOnTheDisk_triggered()
 {
-    QString output = currentConnection->runAndWait("journalctl --disk-usage");
+    QString output = currentConnection->runAndWait("journalctl", { "--disk-usage" });
 
     QMessageBox msgBox;
 
@@ -426,7 +427,8 @@ void MainWindow::on_actionSelectCustomDirectory_triggered()
 
     // Check for existing journals
     currentConnection->setParam(LOCAL_DIRECTORY, dir);
-    QString listBootsOutput = currentConnection->runAndWait("journalctl -q --list-boots");
+
+    QString listBootsOutput = currentConnection->runAndWait("journalctl", { "-q", "--list-boots" });
     if (listBootsOutput.length() == 0) {
         QMessageBox message_box;
         message_box.critical(nullptr, "Error", "No entries have been found at the given directory. Please select a folder containing systemd journals.");

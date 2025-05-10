@@ -112,17 +112,14 @@ void ShowBootLog::updateBootLog(bool keepIdentifiers)
         // Reset all previously accepted but also read identifiers   (clear the filter but also do a full reload!)
         this->allIdentifiers.clear();
         this->acceptedIdentifiers.clear();
-        identifierFlags = "";
 
         // Also reset the UI parts
         ui->acceptedIdentifierLabel->setText("");
 
     } else {
         // Regenerate all flags
-        identifierFlags = "";
         QString acceptedIdentifierLabelText = "";
         for(QString identifier : this->acceptedIdentifiers){
-            identifierFlags += " -t " + identifier;
             acceptedIdentifierLabelText += identifier + "  ";
         }
 
@@ -139,34 +136,39 @@ void ShowBootLog::updateBootLog(bool keepIdentifiers)
     }
 
 
-    QString sinceStr = "";
-    if(sinceFlag){
-        sinceStr = " --since \"" + ui->sinceDateTimeEdit->dateTime().toString("yyyy-MM-dd hh:mm:00") + "\"";
-    }
-
-    QString untilStr = "";
-    if(untilFlag){
-        untilStr = " --until \"" + ui->untilDateTimeEdit->dateTime().toString("yyyy-MM-dd hh:mm:00") + "\"";
-    }
-
-
-    QString command = "";
+    QStringList arguments;
+    arguments << "-q";
     if(this->completeJournal){
-        command = "journalctl -q -a -p " + QString::number(maxPriority) + sinceStr + untilStr;
+        arguments << "-a";
     } else {
         if(this->realtime){
-            command = "journalctl -q -f --no-tail -p " + QString::number(maxPriority) + " -b " + bootid + sinceStr + untilStr;
+            arguments << "-f" << "--no-tail";
         } else {
-            command = "journalctl -q -a -p " + QString::number(maxPriority) + " -b " + bootid + sinceStr + untilStr;
+            arguments << "-a";
         }
+        arguments << "-b";
+        if(!bootid.isEmpty()){
+            arguments << bootid;
+        }
+    }
+    arguments << "-p" << QString::number(maxPriority);
+
+    if(sinceFlag){
+        arguments << "--since" << ui->sinceDateTimeEdit->dateTime().toString("yyyy-MM-dd hh:mm:00");
+    }
+
+    if(untilFlag){
+        arguments << "--until" << ui->untilDateTimeEdit->dateTime().toString("yyyy-MM-dd hh:mm:00");
     }
 
     if(this->reverse){
-        command = command + " -r";
+        arguments << "-r";
     }
 
     // Enable filtering by syslog identifiers
-    command += identifierFlags;
+    for(QString identifier : this->acceptedIdentifiers){
+        arguments << "-t" << identifier;
+    }
 
     // As soon as the connection has data available, we want to append it to the boot log.
     // If the connection is already open, we close it!
@@ -178,7 +180,7 @@ void ShowBootLog::updateBootLog(bool keepIdentifiers)
 
     // Reset byte counter
     numberOfBytesRead = 0;
-    connection->run(command);
+    connection->run("journalctl", arguments);
 }
 
 void ShowBootLog::acceptIdentifier(void){

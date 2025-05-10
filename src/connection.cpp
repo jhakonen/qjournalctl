@@ -48,21 +48,21 @@ void Connection::processData(QString data)
     emit connectionDataAvailable(data);
 }
 
-void Connection::run(QString cmd)
+void Connection::run(QString program, QStringList arguments)
 {
     if(remote){
-        remoteConnection->run(cmd);
+        remoteConnection->run(program, arguments);
     } else {
-        localConnection->run(cmd);
+        localConnection->run(program, arguments);
     }
 }
 
-QString Connection::runAndWait(QString cmd)
+QString Connection::runAndWait(QString program, QStringList arguments)
 {
     if(remote){
-        return remoteConnection->runAndWait(cmd);
+        return remoteConnection->runAndWait(program, arguments);
     } else {
-        return localConnection->runAndWait(cmd);
+        return localConnection->runAndWait(program, arguments);
     }
 }
 

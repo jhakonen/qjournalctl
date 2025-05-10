@@ -26,8 +26,8 @@ public:
     Remote(QObject *qObject, SSHConnectionSettings *sshSettings);
     ~Remote();
 
-    void run(QString cmd);
-    QString runAndWait(QString cmd);
+    void run(QString program, QStringList arguments);
+    QString runAndWait(QString program, QStringList arguments);
     void close();
     bool isRunning();
 

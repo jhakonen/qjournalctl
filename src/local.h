@@ -19,7 +19,7 @@ public:
     Local(QObject *qObject);
     ~Local();
 
-    void run(QString);
+    void run(QString, QStringList);
     void close();
     void setDirectory(QString);
     bool isRunning();
@@ -35,7 +35,7 @@ public slots:
     void processHasData();
 
 public:
-    QString runAndWait(QString cmd);
+    QString runAndWait(QString, QStringList);
 };
 
 #endif // LOCAL_H
