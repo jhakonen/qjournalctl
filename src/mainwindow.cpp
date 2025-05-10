@@ -118,7 +118,7 @@ void MainWindow::on_listBootsButton_clicked()
     QStringList lines = listBootsOutput.split("\n", Qt::SkipEmptyParts);
 
 
-    bootModel = new QStandardItemModel(1, 5, this);
+    bootModel = new QStandardItemModel(0, 5, this);
     bootModel->setHorizontalHeaderItem(0, new QStandardItem(QString("Boot No.")));
     bootModel->setHorizontalHeaderItem(1, new QStandardItem(QString("Boot ID")));
     bootModel->setHorizontalHeaderItem(2, new QStandardItem(QString("Day")));
@@ -133,12 +133,21 @@ void MainWindow::on_listBootsButton_clicked()
             continue;
         }
 
+        QList<QStandardItem*> items;
         for(int j=0; j<5; j++){
             QStandardItem *item = new QStandardItem(columns.at(j).toLocal8Bit().constData());
-            bootModel->setItem(lines.size()-i-1, j, item);
+            if(j == 0){
+                // Store boot ID also as an integer for sortting
+                item->setData(item->text().toInt(), Qt::UserRole);
+            }
+            items << item;
         }
+        bootModel->appendRow(items);
 
     }
+    // Sort boots by ID, current boot at top
+    bootModel->setSortRole(Qt::UserRole);
+    bootModel->sort(0, Qt::DescendingOrder);
 
     ui->tableView->verticalHeader()->setVisible(false);
 
