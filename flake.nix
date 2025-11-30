@@ -1,5 +1,5 @@
 {
-  inputs.nixpkgs.url = github:nixos/nixpkgs/nixpkgs-unstable;
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
   outputs = inputs: let
     system = "x86_64-linux";
